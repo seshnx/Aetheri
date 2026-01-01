@@ -14,7 +14,12 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git fetch:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\ricar\\\\Documents\\\\Amalia Media LLC\\\\Plugins\\\\Aetheri\\\\build.ps1\" -Clean -Configure)",
+      "Bash(start \"\" \"C:\\\\Users\\\\ricar\\\\Documents\\\\Amalia Media LLC\\\\Plugins\\\\Aetheri\\\\build\\\\Aetheri_artefacts\\\\Release\\\\Standalone\\\\Aetheri.exe\")",
+      "Bash(cat:*)",
+      "Bash(cmake --build:*)"
     ]
   }
 }

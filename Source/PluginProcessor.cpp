@@ -357,7 +357,10 @@ void AetheriAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock
     // Prepare VU meters (at original rate)
     inputVU.prepare(sampleRate);
     outputVU.prepare(sampleRate);
-    
+
+    // Prepare spectrum analyzer
+    spectrumAnalyzer.prepare(sampleRate);
+
     // Auto-gain compensation
     autoGainAdjustment.reset(sampleRate, 0.05);  // 50ms smoothing
     autoGainAdjustment.setCurrentAndTargetValue(0.0f);
@@ -374,6 +377,7 @@ void AetheriAudioProcessor::releaseResources()
     filterSection.reset();
     inputVU.reset();
     outputVU.reset();
+    spectrumAnalyzer.reset();
 }
 
 bool AetheriAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
@@ -625,9 +629,12 @@ void AetheriAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     
     // Calculate phase correlation (on output)
     calculatePhaseCorrelation(buffer);
-    
+
     // Measure output levels
     outputVU.pushSamples(buffer);
+
+    // Push to spectrum analyzer (output signal)
+    spectrumAnalyzer.pushBuffer(buffer);
 }
 
 bool AetheriAudioProcessor::hasEditor() const

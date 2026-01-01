@@ -20,6 +20,7 @@
 #include "DSP/HysteresisProcessor.h"
 #include "DSP/VUMeter.h"
 #include "DSP/HighLowPassFilters.h"
+#include "DSP/SpectrumAnalyzer.h"
 #include "Utils/Parameters.h"
 
 class AetheriAudioProcessor : public juce::AudioProcessor
@@ -89,7 +90,10 @@ public:
     
     // Phase correlation (for meter)
     float getPhaseCorrelation() const { return phaseCorrelation; }
-    
+
+    // Spectrum analyzer (for UI)
+    Aetheri::StereoSpectrumAnalyzer& getSpectrumAnalyzer() { return spectrumAnalyzer; }
+
     // A/B Comparison methods
     void toggleAB();
     bool isStateA() const { return currentIsStateA; }
@@ -106,6 +110,9 @@ private:
     // Metering
     Aetheri::StereoVUMeter inputVU;
     Aetheri::StereoVUMeter outputVU;
+
+    // Spectrum analyzer
+    Aetheri::StereoSpectrumAnalyzer spectrumAnalyzer;
     
     // Cached parameter values
     std::atomic<float>* inputGainParam = nullptr;

@@ -25,6 +25,7 @@
 #include "UI/TubeGlowEffect.h"
 #include "UI/AnalogKnob.h"
 #include "UI/PhaseCorrelationMeter.h"
+#include "UI/SpectrumDisplay.h"
 
 class AetheriAudioProcessorEditor : public juce::AudioProcessorEditor,
                                      public juce::Timer,
@@ -90,6 +91,9 @@ private:
     
     // Phase Correlation Meter
     Aetheri::PhaseCorrelationMeter phaseCorrMeter;
+
+    // Spectrum Analyzer Display
+    Aetheri::SpectrumDisplay spectrumDisplay;
     
     // Oversampling
     juce::ComboBox oversamplingSelector;
@@ -137,12 +141,12 @@ private:
     std::unique_ptr<juce::ResizableCornerComponent> resizer;
     
     static constexpr int DEFAULT_WIDTH = 1500;  // 25% wider (1200 * 1.25)
-    static constexpr int DEFAULT_HEIGHT = 650;
+    static constexpr int DEFAULT_HEIGHT = 780;  // Increased for spectrum analyzer
     static constexpr int MIN_WIDTH = 1200;  // Scaled proportionally
-    static constexpr int MIN_HEIGHT = 520;  // Scaled proportionally
+    static constexpr int MIN_HEIGHT = 624;  // Scaled proportionally (keeps aspect ratio)
     
     // Version number - increment by 0.01 for each fix
-    static constexpr const char* PLUGIN_VERSION = "v00.14";
+    static constexpr const char* PLUGIN_VERSION = "v00.15";
     
     // Aspect ratio for locked resizing
     static constexpr double ASPECT_RATIO = static_cast<double>(DEFAULT_WIDTH) / DEFAULT_HEIGHT;

@@ -5,6 +5,22 @@ All notable changes to the Aetheri High-Fidelity Dual-Channel Mastering EQ plugi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v00.15] - 2024-12-28
+
+### Added
+- **Spectrum Analyzer**: Real-time FFT spectrum analyzer with 2048-point analysis
+- **EQ Curve Overlay**: Visual representation of the current EQ response curve
+- **Band Markers**: Color-coded dots showing each band's frequency and gain on the curve
+- **Stereo Spectrum**: Averaged L/R spectrum display with smooth animations
+- **Logarithmic Frequency Scale**: 20Hz-20kHz range with proper frequency distribution
+
+### Changed
+- Increased default window height (780px) to accommodate spectrum display
+- Updated minimum window size to maintain aspect ratio
+
+### Fixed
+- **Documentation**: Fixed AAX_SETUP.md references from "Knobula" to "Aetheri"
+
 ## [v00.14] - 2024-12-24
 
 ### Added
@@ -195,6 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History Summary
 
+- **v00.15**: Spectrum analyzer with EQ curve overlay, documentation fixes
 - **v00.14**: Latency reporting, bypass, preset fixes, multi-platform CI
 - **v00.13**: Multi-platform CI/CD workflow
 - **v00.12**: Version display, Mac build support, stability improvements

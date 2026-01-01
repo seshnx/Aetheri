@@ -12,7 +12,7 @@ This guide explains how to build and distribute an AAX version of Aetheri for Av
 4. Extract to a location (e.g., `C:/AAX_SDK` on Windows or `~/AAX_SDK` on macOS)
 
 ### Step 2: Configure CMakeLists.txt
-1. Open `Knobula/CMakeLists.txt`
+1. Open `Aetheri/CMakeLists.txt`
 2. Find the AAX SDK configuration section (around line 24)
 3. Uncomment and set the path:
    ```cmake
@@ -27,7 +27,7 @@ This guide explains how to build and distribute an AAX version of Aetheri for Av
 
 ### Step 3: Rebuild
 ```bash
-cd Knobula/build
+cd Aetheri/build
 cmake ..
 cmake --build . --config Release
 ```

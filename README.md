@@ -1,6 +1,10 @@
-# Aetheri - High-Fidelity Dual-Channel Mastering EQ
+# SeshNx Aetheri
+
+**High-Fidelity Dual-Channel Mastering EQ**
 
 A professional mastering EQ plugin with analog character, built with JUCE 8.
+
+**Part of the SeshNx Plugin Suite by Amalia Media LLC**
 
 ## Features
 
@@ -141,7 +145,7 @@ Authentic VU ballistics:
 ```cpp
 // Band Colors (Nebula)
 bandLF   = 0xFF4488FF  // Blue
-bandLMF  = 0xFF44DD88  // Green  
+bandLMF  = 0xFF44DD88  // Green
 bandHMF  = 0xFFDDCC44  // Yellow
 bandHF   = 0xFFFF6644  // Red/Orange
 
@@ -150,3 +154,27 @@ panelBackground = 0xFF1A1A1E  // Deep charcoal
 panelSurface    = 0xFF242428  // Slightly lighter
 tubeGlowOn      = 0x44FF9944  // Warm amber
 ```
+
+---
+
+## Version
+
+**v1.0.0**
+
+---
+
+## License
+
+Copyright (c) 2024 Amalia Media LLC. All rights reserved.
+
+Proprietary software - Distribution prohibited without explicit permission.
+
+---
+
+## Support
+
+For technical support, bug reports, or feature requests, please contact the development team through official SeshNx channels.
+
+---
+
+*Part of the [SeshNx Plugin Suite](https://seshnx.com) by Amalia Media LLC*

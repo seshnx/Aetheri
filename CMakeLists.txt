@@ -102,6 +102,8 @@ set(DSP_SOURCES
     Source/DSP/MidSideProcessor.cpp
     Source/DSP/HighLowPassFilters.h
     Source/DSP/HighLowPassFilters.cpp
+    Source/DSP/SpectrumAnalyzer.h
+    Source/DSP/SpectrumAnalyzer.cpp
 )
 
 # Source files - UI
@@ -122,6 +124,8 @@ set(UI_SOURCES
     Source/UI/TubeGlowEffect.cpp
     Source/UI/PhaseCorrelationMeter.h
     Source/UI/PhaseCorrelationMeter.cpp
+    Source/UI/SpectrumDisplay.h
+    Source/UI/SpectrumDisplay.cpp
 )
 
 # Source files - Utils

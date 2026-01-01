@@ -87,7 +87,13 @@ AetheriAudioProcessorEditor::AetheriAudioProcessorEditor(AetheriAudioProcessor& 
     
     // Phase correlation meter
     addAndMakeVisible(phaseCorrMeter);
-    
+
+    // Spectrum display
+    addAndMakeVisible(spectrumDisplay);
+    spectrumDisplay.setSpectrumAnalyzer(&audioProcessor.getSpectrumAnalyzer());
+    spectrumDisplay.setParameters(&audioProcessor.getParameters());
+    spectrumDisplay.setSampleRate(44100.0);  // Will be updated in timerCallback
+
     // Tube glow overlay (on top of everything)
     addAndMakeVisible(tubeGlow);
     tubeGlow.setOpaque(false);  // Transparent overlay
@@ -513,10 +519,18 @@ void AetheriAudioProcessorEditor::resized()
     
     // Main content area (scaled)
     contentBounds.reduce(static_cast<int>(15 * scale), static_cast<int>(10 * scale));
-    
+
+    // Spectrum analyzer at the top of content area
+    int spectrumHeight = static_cast<int>(120 * scale);
+    auto spectrumArea = contentBounds.removeFromTop(spectrumHeight);
+    spectrumArea.reduce(static_cast<int>(100 * scale), 0);  // Add margins on sides
+    spectrumDisplay.setBounds(spectrumArea.reduced(0, static_cast<int>(5 * scale)));
+
+    contentBounds.removeFromTop(static_cast<int>(5 * scale));  // Spacing
+
     // Resizer in corner (at window coordinates, not scaled)
     resizer->setBounds(getWidth() - 16, getHeight() - 16, 16, 16);
-    
+
     // Professional Mastering EQ Layout (inspired by AMEK):
     // [Input VU] [HPF] [IN GAIN] | [EQ LEFT] [CENTER] [EQ RIGHT] | [OUT GAIN] [LPF] [Output VU]
     
