@@ -31,16 +31,20 @@ namespace Aetheri
     
     void EQBand::setParameters(float frequency, float gainDB, float q, CurveType curve, bool enabled)
     {
+        // Check if any parameters actually changed (compare against old values)
+        bool paramChanged = (frequency != currentFreq || gainDB != currentGainDB ||
+                            q != currentQ || curve != currentCurve || enabled != bandEnabled);
+
         bandEnabled = enabled;
         currentQ = q;
         currentCurve = curve;
-        
-        if (frequency != currentFreq || gainDB != currentGainDB || curve != currentCurve)
+        currentFreq = frequency;
+        currentGainDB = gainDB;
+
+        if (paramChanged)
         {
             smoothedFreq.setCurrentAndTargetValue(frequency);
             smoothedGain.setCurrentAndTargetValue(gainDB);
-            currentFreq = frequency;
-            currentGainDB = gainDB;
             needsUpdate = true;
             // Force immediate coefficient update
             updateCoefficients();
@@ -163,9 +167,9 @@ namespace Aetheri
     
     void EQBand::processBlock(float* data, int numSamples)
     {
-        if (!bandEnabled)
+        if (!bandEnabled || data == nullptr)
             return;
-        
+
         for (int i = 0; i < numSamples; ++i)
         {
             data[i] = processSample(data[i]);
@@ -451,14 +455,14 @@ namespace Aetheri
         auto* left = buffer.getWritePointer(0);
         auto* right = buffer.getWritePointer(1);
         int numSamples = buffer.getNumSamples();
-        
+
         for (int i = 0; i < numSamples; ++i)
         {
             float l = left[i];
             float r = right[i];
-            
-            left[i] = (l + r) * 0.5f;   // Mid
-            right[i] = (l - r) * 0.5f;  // Side
+
+            left[i] = (l + r);   // Mid
+            right[i] = (l - r);  // Side
         }
     }
     
@@ -467,14 +471,14 @@ namespace Aetheri
         auto* mid = buffer.getWritePointer(0);
         auto* side = buffer.getWritePointer(1);
         int numSamples = buffer.getNumSamples();
-        
+
         for (int i = 0; i < numSamples; ++i)
         {
             float m = mid[i];
             float s = side[i];
-            
-            mid[i] = m + s;   // Left
-            side[i] = m - s;  // Right
+
+            mid[i] = (m + s) * 0.5f;   // Left
+            side[i] = (m - s) * 0.5f;  // Right
         }
     }
 }

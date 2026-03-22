@@ -111,7 +111,11 @@ namespace Aetheri
         
         const VUMeter& getLeft() const { return meters[0]; }
         const VUMeter& getRight() const { return meters[1]; }
-        
+
+        // Get stereo peak level (maximum of both channels)
+        float getStereoPeakDB() const;
+        float getNormalizedStereoPeak() const;
+
     private:
         std::array<VUMeter, 2> meters;
     };

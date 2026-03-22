@@ -45,12 +45,13 @@ namespace Aetheri
     {
         // Smooth level updates with faster response
         float oldLevel = smoothedLevel;
+        float oldPeak = smoothedPeak;
         // Faster smoothing for more responsive meters (was 0.75f, now 0.5f for 2x faster)
         smoothedLevel = smoothedLevel * 0.5f + targetLevel * 0.5f;  // Faster response
         smoothedPeak = smoothedPeak * 0.7f + peakLevel * 0.3f;  // Faster peak response
-        
+
         // Only repaint if something actually changed (reduces glitches)
-        if (std::abs(smoothedLevel - oldLevel) > 0.001f || std::abs(smoothedPeak - peakLevel) > 0.001f)
+        if (std::abs(smoothedLevel - oldLevel) > 0.001f || std::abs(smoothedPeak - oldPeak) > 0.001f)
         {
             repaint();
         }
@@ -189,8 +190,8 @@ namespace Aetheri
                 break;
                 
             case MeterMode::LUFS:
-                // LUFS scale: -23, -30, -40, -50, -60 LUFS
-                markers = {{1.0f, "-23"}, {0.75f, "-30"}, {0.5f, "-40"}, {0.25f, "-50"}, {0.0f, "-60"}};
+                // LUFS scale: 0, -10, -20, -30, -40 LUFS
+                markers = {{1.0f, "0"}, {0.75f, "-10"}, {0.5f, "-20"}, {0.25f, "-30"}, {0.0f, "-40"}};
                 break;
         }
         

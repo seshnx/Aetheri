@@ -12,23 +12,27 @@ namespace Aetheri
     void VUMeter::prepare(double newSampleRate)
     {
         sampleRate = newSampleRate;
-        
+
         // VU meter has 300ms integration time
         // Attack and release times are both ~300ms for authentic VU behavior
         float vuTimeConstant = 0.3f;  // 300ms
         vuAttackCoeff = std::exp(-1.0f / (static_cast<float>(sampleRate) * vuTimeConstant));
         vuReleaseCoeff = vuAttackCoeff;  // Same for VU meters
-        
+
         // RMS window size (~50ms for faster response)
-        rmsWindowSize = static_cast<int>(sampleRate * 0.05);
-        
+        // Round to nearest multiple of 10 for better modulo behavior
+        rmsWindowSize = static_cast<int>(std::round(sampleRate * 0.05 / 10.0f)) * 10;
+        rmsWindowSize = std::max(rmsWindowSize, 10);  // Minimum 10 samples
+
         // LUFS window size (400ms for LUFS gating)
-        lufsWindowSize = static_cast<int>(sampleRate * 0.4);
-        
+        // Round to nearest multiple of 10 for better modulo behavior
+        lufsWindowSize = static_cast<int>(std::round(sampleRate * 0.4 / 10.0f)) * 10;
+        lufsWindowSize = std::max(lufsWindowSize, 10);  // Minimum 10 samples
+
         // Peak hold time (~2 seconds, then decay)
         peakHoldSamples = static_cast<int>(sampleRate * 2.0);
         peakDecayCoeff = std::exp(-1.0f / (static_cast<float>(sampleRate) * 0.5f));  // 500ms decay
-        
+
         reset();
     }
     
@@ -109,7 +113,7 @@ namespace Aetheri
             rmsSampleCount = 0;
         }
         // Also update on partial windows for faster response (every 10% of window)
-        else if (rmsSampleCount > 0 && (rmsSampleCount % (rmsWindowSize / 10)) == 0)
+        else if (rmsSampleCount > 0 && rmsWindowSize >= 10 && (rmsSampleCount % (rmsWindowSize / 10)) == 0)
         {
             float rmsValue = std::sqrt(static_cast<float>(rmsSum / rmsSampleCount));
             currentLevel = currentLevel * 0.95f + rmsValue * 0.05f;  // Quick smoothing
@@ -161,7 +165,7 @@ namespace Aetheri
             rmsSampleCount = 0;
         }
         // Also update on partial windows for faster response (every 5% of window)
-        else if (rmsSampleCount > 0 && (rmsSampleCount % (rmsWindowSize / 20)) == 0)
+        else if (rmsSampleCount > 0 && rmsWindowSize >= 20 && (rmsSampleCount % (rmsWindowSize / 20)) == 0)
         {
             float rmsValue = std::sqrt(static_cast<float>(rmsSum / rmsSampleCount));
             // Quick update with VU ballistics (faster intermediate updates)
@@ -194,7 +198,7 @@ namespace Aetheri
             lufsSampleCount = 0;
         }
         // Also update on partial windows for faster response (every 10% of window)
-        else if (lufsSampleCount > 0 && (lufsSampleCount % (lufsWindowSize / 10)) == 0)
+        else if (lufsSampleCount > 0 && lufsWindowSize >= 10 && (lufsSampleCount % (lufsWindowSize / 10)) == 0)
         {
             float rmsValue = std::sqrt(static_cast<float>(lufsSum / lufsSampleCount));
             float lufsValue = rmsValue * 0.7079f;
@@ -232,9 +236,10 @@ namespace Aetheri
                 break;
                 
             case MeterMode::LUFS:
-                // LUFS: -23 LUFS = 0 dBFS reference
-                // Simplified: treat as RMS with -23 offset
-                db = 20.0f * std::log10(level) - 23.0f;
+                // LUFS: Approximate EBU R128 standard
+                // 0 dBFS sine wave ≈ -3 LUFS (with K-weighting)
+                // Simplified: use -3 dB offset to approximate K-weighting effect
+                db = 20.0f * std::log10(level) - 3.0f;
                 break;
         }
         
@@ -257,25 +262,27 @@ namespace Aetheri
                 
             case MeterMode::VU:
                 // VU scale: -20 to +3 VU maps to 0.0 to 1.0
-                // 0 VU = -3 dBFS should be around 0.75
+                // 0 VU = -3 dBFS maps to 0.75
                 if (db < -20.0f)
                     return 0.0f;
-                if (db < 0.0f)
+                if (db < -3.0f)
                 {
-                    // -20 to 0 VU maps to 0.0 to 0.75
-                    return (db + 20.0f) / 20.0f * 0.75f;
+                    // -20 to -3 dBFS maps to 0.0 to 0.75
+                    // At -3 dBFS (0 VU), we want 0.75
+                    return (db + 20.0f) / 17.0f * 0.75f;
                 }
                 else
                 {
-                    // 0 to +3 VU maps to 0.75 to 1.0
-                    return 0.75f + (db / 3.0f) * 0.25f;
+                    // -3 to 0 dBFS maps to 0.75 to 1.0 (+3 VU)
+                    return 0.75f + ((db + 3.0f) / 3.0f) * 0.25f;
                 }
                 
             case MeterMode::LUFS:
-                // LUFS scale: -60 to -23 LUFS maps to 0.0 to 1.0
-                if (db < -60.0f)
+                // LUFS scale: -40 to 0 LUFS maps to 0.0 to 1.0
+                // -3 LUFS (0 dBFS) should be near top, -40 LUFS at bottom
+                if (db < -40.0f)
                     return 0.0f;
-                return (db + 60.0f) / 37.0f;  // -60 to -23 = 37 dB range
+                return (db + 40.0f) / 40.0f;  // -40 to 0 = 40 dB range
                 
             default:
                 return 0.0f;
@@ -338,5 +345,19 @@ namespace Aetheri
         {
             meter.setMode(mode);
         }
+    }
+
+    float StereoVUMeter::getStereoPeakDB() const
+    {
+        float leftPeak = meters[0].getPeakDB();
+        float rightPeak = meters[1].getPeakDB();
+        return std::max(leftPeak, rightPeak);
+    }
+
+    float StereoVUMeter::getNormalizedStereoPeak() const
+    {
+        float leftPeak = meters[0].getNormalizedPeak();
+        float rightPeak = meters[1].getNormalizedPeak();
+        return std::max(leftPeak, rightPeak);
     }
 }
